@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 using Minio;
 using Minio.Exceptions;
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -16,37 +16,24 @@ namespace MinioTest.Controllers
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
-
         private readonly ILogger<WeatherForecastController> _logger;
+        private readonly IConfiguration _configuration;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(
+            ILogger<WeatherForecastController> logger,
+            IConfiguration configuration)
         {
             _logger = logger;
-        }
-
-        [HttpGet]
-        public IEnumerable<WeatherForecast> Get()
-        {
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = rng.Next(-20, 55),
-                Summary = Summaries[rng.Next(Summaries.Length)]
-            })
-            .ToArray();
+            _configuration = configuration;
         }
 
         [HttpGet("minio")]
         public async Task<string> Minio()
         {
-            var endpoint = "10.22.18.233:9000";
-            var accessKey = "minioadmin";
-            var secretKey = "Minio@123";
+            var endpoint = _configuration["Minio:Endpoint"];
+            var accessKey = _configuration["Minio:AccessKey"];
+            var secretKey = _configuration["Minio:SecretKey"];
+
             try
             {
                 HttpClientHandler clientHandler = new HttpClientHandler();
@@ -68,19 +55,18 @@ namespace MinioTest.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                _logger.LogError(ex, ex.Message);
             }
-            Console.ReadLine();
 
-            return "demo";
+            return "success";
         }
 
         private async Task UploadFileAsync(MinioClient minio)
         {
-            var bucketName = "abc-invoice";
+            var bucketName = _configuration["Minio:BucketName"];
             //var location = "us-east-1";
-            var objectName = "demo.xml";
-            var filePath = "D:\\demo.xml";
+            var objectName = $@"{DateTime.Now.Ticks}.xml";
+            var filePath = Path.GetFullPath(_configuration["File:Path"]);
             var contentType = "application/xml";
 
             try
@@ -95,7 +81,7 @@ namespace MinioTest.Controllers
             }
             catch (MinioException e)
             {
-                Console.WriteLine("File Upload Error: {0}", e.Message);
+                _logger.LogError(e.InnerException, e.Message);
             }
         }
     }
