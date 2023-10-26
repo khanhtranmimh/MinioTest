@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Minio" Version="4.0.7" />
+    <PackageReference Include="MongoDB.Driver.GridFS" Version="2.22.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
   </ItemGroup>
 
