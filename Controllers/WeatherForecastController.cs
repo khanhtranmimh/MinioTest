@@ -37,11 +37,11 @@ namespace MinioTest.Controllers
         [HttpGet("gridfs")]
         public void CreateBucket()
         {
-            var mongoClient = new MongoClient("connection_string");
-            IMongoDatabase database = mongoClient.GetDatabase("database_name");
+            var mongoClient = new MongoClient("mongodb://localhost:27017");
+            IMongoDatabase database = mongoClient.GetDatabase("gridfs");
             var options = new GridFSBucketOptions
             {
-                BucketName = "your_bucket_name",
+                BucketName = "smallfile",
                 ChunkSizeBytes = 255 * 1024 //255 MB is the default value
             };
             GridFSBucket bucket = new(database, options);
@@ -52,57 +52,70 @@ namespace MinioTest.Controllers
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
-        public async Task UploadAsync(IFormFile file)
+        [HttpPost("gridfs/upload")]
+        public async Task UploadAsync()
         {
-            var mongoClient = new MongoClient("connection_string");
-            IMongoDatabase database = mongoClient.GetDatabase("database_name");
+            var mongoClient = new MongoClient("mongodb://localhost:27017");
+            IMongoDatabase database = mongoClient.GetDatabase("local");
             GridFSBucket bucket = new GridFSBucket(database);
-            var type = file.ContentType.ToString();
-            var fileName = file.FileName;
 
-            var options = new GridFSUploadOptions
+            string path = @"C:/Users/ADMIN/Downloads/0102182292-998-1-K23TLL-00000233.xml";
+            using (var streams = System.IO.File.OpenRead(path))
             {
-                Metadata = new BsonDocument { { "FileName", fileName }, { "Type", type } }
-            };
+                var file = new FormFile(streams, 0, streams.Length, null, Path.GetFileName(streams.Name))
+                {
+                    Headers = new HeaderDictionary(),
+                    ContentType = "application/xml"
+                };
 
-            using var stream = await bucket.OpenUploadStreamAsync(fileName, options); // Open the output stream
-            var id = stream.Id; // Unique Id of the file
-            file.CopyTo(stream); // Copy the contents to the stream
-            await stream.CloseAsync();
+                var type = file.ContentType.ToString();
+                var fileName = file.FileName;
+
+                var options = new GridFSUploadOptions
+                {
+                    Metadata = new BsonDocument { { "FileName", fileName }, { "Type", type } }
+                };
+
+                using var stream = await bucket.OpenUploadStreamAsync(fileName, options); // Open the output stream
+                var id = stream.Id; // Unique Id of the file
+                file.CopyTo(stream); // Copy the contents to the stream
+                await stream.CloseAsync();
+            }
         }
 
         //Method 1
-
+        [HttpPost("gridfs/getfilebyname")]
         public async Task<byte[]> GetFileByNameAsync(string fileName)
         {
-            var mongoClient = new MongoClient("connection_string");
-            IMongoDatabase database = mongoClient.GetDatabase("database_name");
+            var mongoClient = new MongoClient("mongodb://localhost:27017");
+            IMongoDatabase database = mongoClient.GetDatabase("local");
             GridFSBucket bucket = new GridFSBucket(database);
             return await bucket.DownloadAsBytesByNameAsync(fileName);
         }
 
-
         //Method 2
-
+        [HttpPost("gridfs/getfilebyId")]
         public async Task<byte[]> GetFileByIdAsync(string fileName)
         {
-            var mongoClient = new MongoClient("connection_string");
-            IMongoDatabase database = mongoClient.GetDatabase("database_name");
+            var mongoClient = new MongoClient("mongodb://localhost:27017");
+            IMongoDatabase database = mongoClient.GetDatabase("local");
             GridFSBucket bucket = new GridFSBucket(database);
             var fileInfo = await FindFile(fileName);
             return await bucket.DownloadAsBytesAsync(fileInfo.Id);
         }
 
+        [HttpPost("gridfs/find-file")]
         private async Task<GridFSFileInfo> FindFile(string fileName)
         {
-            var mongoClient = new MongoClient("connection_string");
-            IMongoDatabase database = mongoClient.GetDatabase("database_name");
+            var mongoClient = new MongoClient("mongodb://localhost:27017");
+            IMongoDatabase database = mongoClient.GetDatabase("local");
             GridFSBucket bucket = new GridFSBucket(database);
             var options = new GridFSFindOptions
             {
                 Limit = 1
             };
             var filter = Builders<GridFSFileInfo>.Filter.Eq(x => x.Filename, fileName);
+            var filters = Builders<GridFSFileInfo>.Filter.Eq(x => x.Filename, fileName);
             using var cursor = await bucket.FindAsync(filter, options);
             return (await cursor.ToListAsync()).FirstOrDefault();
         }
