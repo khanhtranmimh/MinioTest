@@ -5,6 +5,8 @@ using Microsoft.Extensions.Logging;
 
 using Minio;
 using Minio.Exceptions;
+using MinioTest.Service;
+
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
@@ -29,6 +31,12 @@ namespace MinioTest.Controllers
         {
             _logger = logger;
             _configuration = configuration;
+        }
+
+        [HttpPost("encryption")]
+        public void EncryptionAsync()
+        {
+            QueryableEncryptionTutorial.RunExample();
         }
 
         /// <summary>
