@@ -59,7 +59,7 @@ namespace MinioTest.Controllers
             IMongoDatabase database = mongoClient.GetDatabase("local");
             GridFSBucket bucket = new GridFSBucket(database);
 
-            string path = @"C:/Users/ADMIN/Downloads/0102182292-998-1-K23TLL-00000233.xml";
+            string path = @"D:/Invoice01.zip";
             using (var streams = System.IO.File.OpenRead(path))
             {
                 var file = new FormFile(streams, 0, streams.Length, null, Path.GetFileName(streams.Name))
