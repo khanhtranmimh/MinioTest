@@ -186,9 +186,9 @@ namespace MinioTest.Service
 
                 // start-kmip-encryption-options
                 var extraOptions = new Dictionary<string, object>
-            {
-                { "cryptSharedLibPath", _appSettings["CryptSharedLibPath"] } // Path to your Automatic Encryption Shared Library
-            };
+                {
+                    { "cryptSharedLibPath", _appSettings["CryptSharedLibPath"] } // Path to your Automatic Encryption Shared Library
+                };
 
                 var autoEncryptionOptions = new AutoEncryptionOptions(
                     keyVaultNamespace,
@@ -200,7 +200,7 @@ namespace MinioTest.Service
             }
             else
             {
-                // start-auto-encryption-options
+                // // start - auto - encryption - options
                 var extraOptions = new Dictionary<string, object>
                 {
                     { "cryptSharedLibPath", _appSettings["CryptSharedLibPath"] } // Path to your Automatic Encryption Shared Library
@@ -209,6 +209,7 @@ namespace MinioTest.Service
                 var autoEncryptionOptions = new AutoEncryptionOptions(
                     keyVaultNamespace,
                     kmsProviderCredentials,
+                    bypassAutoEncryption: true,
                     extraOptions: extraOptions);
                 // end-auto-encryption-options
 
