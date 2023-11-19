@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 
 using Minio;
 using Minio.Exceptions;
+using MinioTest.Dto;
 using MinioTest.Service;
 
 using MongoDB.Bson;
@@ -36,7 +37,44 @@ namespace MinioTest.Controllers
         [HttpPost("encryption")]
         public void EncryptionAsync()
         {
-            QueryableEncryptionTutorial.RunExample();
+            QueryableEncryptionTutorial.Upload();
+            //QueryableEncryptionTutorial.InvoiceExample();
+            //QueryableEncryptionTutorial.RunExample();
+        }
+
+        [HttpPost("upload")]
+        public void UploadEncryptionAsync()
+        {
+            QueryableEncryptionTutorial.Upload();
+            //QueryableEncryptionTutorial.InvoiceExample();
+            //QueryableEncryptionTutorial.RunExample();
+        }
+
+        [HttpPost("getBySsn")]
+        public async Task<string> GetBySsnAsync(string ssn)
+        {
+            return await QueryableEncryptionTutorial.Get(ssn);
+            //QueryableEncryptionTutorial.InvoiceExample();
+            //QueryableEncryptionTutorial.RunExample();
+        }
+
+        [HttpPost("test")]
+        public void Test()
+        {
+            var mongoClient = new MongoClient("mongodb://localhost:27017");
+            IMongoDatabase database = mongoClient.GetDatabase("invoice");
+            var collectionOptions = new CreateCollectionOptions<InvoiceSsn>();
+            database.CreateCollection("invoiceSsn", collectionOptions);
+
+            //var clientSettings = MongoClientSettings.FromConnectionString("mongodb://localhost:27017");
+            //var encryptedClient = new MongoClient(clientSettings);
+            //var encryptedCollection = encryptedClient.GetDatabase("medicalRecords").
+            //    GetCollection<Patient>("patients");
+
+            //var ssnFilter = Builders<Patient>.Filter.Eq("record.ssn", "987-65-4320");
+            //var findResult = await encryptedCollection.Find(ssnFilter).ToCursorAsync();
+
+            //return findResult.FirstOrDefault().ToJson();
         }
 
         /// <summary>

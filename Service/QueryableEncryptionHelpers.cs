@@ -107,9 +107,9 @@ namespace MinioTest.Service
                     var localCustomerMasterKeyBytes = Convert.FromBase64String(localCustomerMasterKeyBase64);
 
                     var localOptions = new Dictionary<string, object>
-                {
-                    { "key", localCustomerMasterKeyBytes }
-                };
+                    {
+                        { "key", localCustomerMasterKeyBytes }
+                    };
 
                     kmsProviderCredentials.Add(kmsProvider, localOptions);
                 }
@@ -209,7 +209,7 @@ namespace MinioTest.Service
                 var autoEncryptionOptions = new AutoEncryptionOptions(
                     keyVaultNamespace,
                     kmsProviderCredentials,
-                    bypassAutoEncryption: true,
+                    bypassAutoEncryption: false,
                     extraOptions: extraOptions);
                 // end-auto-encryption-options
 
