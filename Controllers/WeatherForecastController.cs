@@ -37,15 +37,15 @@ namespace MinioTest.Controllers
         [HttpPost("encryption")]
         public void EncryptionAsync()
         {
-            QueryableEncryptionTutorial.Upload();
-            //QueryableEncryptionTutorial.InvoiceExample();
+            // chỉ chạy lần đầu tiên
+            QueryableEncryptionTutorial.InvoiceExample();
             //QueryableEncryptionTutorial.RunExample();
         }
 
         [HttpPost("upload")]
-        public void UploadEncryptionAsync()
+        public async Task<string> UploadEncryptionAsync()
         {
-            QueryableEncryptionTutorial.Upload();
+            return await QueryableEncryptionTutorial.Upload();
             //QueryableEncryptionTutorial.InvoiceExample();
             //QueryableEncryptionTutorial.RunExample();
         }
