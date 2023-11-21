@@ -50,6 +50,15 @@ namespace MinioTest.Controllers
             //QueryableEncryptionTutorial.RunExample();
         }
 
+
+        [HttpPost("upload-one-document")]
+        public async Task<object> UploadEncryptionAsync([FromBody] UploadDto uploadDto)
+        {
+            return await QueryableEncryptionTutorial.UploadDocumentAsync(uploadDto.Xml);
+            //QueryableEncryptionTutorial.InvoiceExample();
+            //QueryableEncryptionTutorial.RunExample();
+        }
+
         [HttpPost("getBySsn")]
         public async Task<string> GetBySsnAsync(string ssn)
         {
@@ -61,7 +70,7 @@ namespace MinioTest.Controllers
         [HttpPost("test")]
         public void Test()
         {
-            var mongoClient = new MongoClient("mongodb://localhost:27017");
+            var mongoClient = new MongoClient("mongodb://localhost:27888/?directConnection=true");
             IMongoDatabase database = mongoClient.GetDatabase("invoice");
             var collectionOptions = new CreateCollectionOptions<InvoiceSsn>();
             database.CreateCollection("invoiceSsn", collectionOptions);
